@@ -9,3 +9,4 @@ The final state can be observed on the main branch.
 ## Branches
 
 - 00: Project initialization
+- 01: Spring beans
