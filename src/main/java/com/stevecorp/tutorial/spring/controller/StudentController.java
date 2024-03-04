@@ -3,10 +3,13 @@ package com.stevecorp.tutorial.spring.controller;
 import com.stevecorp.tutorial.spring.model.Student;
 import com.stevecorp.tutorial.spring.service.StudentService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.data.web.SortDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 import static com.stevecorp.tutorial.spring.util.StudentGenerator.generateStudent;
 
@@ -29,17 +32,18 @@ public class StudentController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Student>> getStudents(
+    public ResponseEntity<Page<Student>> getStudents(
+            @PageableDefault(value = 20, page = 0) @SortDefault(sort = "name.firstName", direction = Sort.Direction.ASC) Pageable pageable,
             @RequestParam(name = "city_zip", required = false) final String cityZip,
             @RequestParam(name = "year_of_birth", required = false) final Integer yearOfBirth
     ) {
-        final List<Student> students;
+        final Page<Student> students;
         if (cityZip != null) {
-            students = studentService.getStudentsWithAddressInCity(cityZip);
+            students = studentService.getStudentsWithAddressInCity(cityZip, pageable);
         } else if (yearOfBirth != null) {
-            students = studentService.getStudentsBornInYear(yearOfBirth);
+            students = studentService.getStudentsBornInYear(yearOfBirth, pageable);
         } else {
-            students = studentService.getAllStudents();
+            students = studentService.getAllStudents(pageable);
         }
         return ResponseEntity.ok(students);
     }

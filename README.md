@@ -14,3 +14,4 @@ The final state can be observed on the main branch.
 - 03: Spring data
 - 04: Spring web
 - 05: Spring profiles
+- 06: Paging and sorting
