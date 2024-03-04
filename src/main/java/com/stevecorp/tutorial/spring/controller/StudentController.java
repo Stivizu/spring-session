@@ -1,6 +1,8 @@
 package com.stevecorp.tutorial.spring.controller;
 
 import com.stevecorp.tutorial.spring.model.Student;
+import com.stevecorp.tutorial.spring.model.view.StudentMapper;
+import com.stevecorp.tutorial.spring.model.view.StudentView;
 import com.stevecorp.tutorial.spring.service.StudentService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -11,6 +13,8 @@ import org.springframework.data.web.SortDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import static com.stevecorp.tutorial.spring.model.view.StudentMapper.toDomain;
+import static com.stevecorp.tutorial.spring.model.view.StudentMapper.toView;
 import static com.stevecorp.tutorial.spring.util.StudentGenerator.generateStudent;
 
 @RestController
@@ -24,15 +28,16 @@ public class StudentController {
     }
 
     @GetMapping("/{student_id}")
-    public ResponseEntity<Student> getStudent(
+    public ResponseEntity<StudentView> getStudent(
             @PathVariable(name = "student_id") final long studentId
     ) {
         final Student student = studentService.getStudent(studentId);
-        return ResponseEntity.ok(student);
+        final StudentView studentView = toView(student);
+        return ResponseEntity.ok(studentView);
     }
 
     @GetMapping
-    public ResponseEntity<Page<Student>> getStudents(
+    public ResponseEntity<Page<StudentView>> getStudents(
             @PageableDefault(value = 20, page = 0) @SortDefault(sort = "name.firstName", direction = Sort.Direction.ASC) Pageable pageable,
             @RequestParam(name = "city_zip", required = false) final String cityZip,
             @RequestParam(name = "year_of_birth", required = false) final Integer yearOfBirth
@@ -45,7 +50,8 @@ public class StudentController {
         } else {
             students = studentService.getAllStudents(pageable);
         }
-        return ResponseEntity.ok(students);
+        final Page<StudentView> studentViews = students.map(StudentMapper::toView);
+        return ResponseEntity.ok(studentViews);
     }
 
     @PostMapping
@@ -53,14 +59,9 @@ public class StudentController {
             /*
                 The @Valid annotation triggers all the validators (both existing and custom)
              */
-            @Valid @RequestBody final Student student
+            @Valid @RequestBody final StudentView studentView
     ) {
-        /*
-            Note that for insurance purposes, we also set the student field in the addresses.
-             This way we don't have to do it in the HTTP request.
-             This could also easily be aligned with the frontend.
-         */
-        student.getAddresses().forEach(address -> address.setStudent(student));
+        final Student student = toDomain(studentView);
         studentService.addStudent(student);
         return ResponseEntity.accepted().build();
     }
@@ -75,9 +76,9 @@ public class StudentController {
     @PutMapping("/{student_id}")
     public ResponseEntity<Void> updateStudent(
             @PathVariable(name = "student_id") final long studentId,
-            @Valid @RequestBody final Student student
+            @Valid @RequestBody final StudentView studentView
     ) {
-        student.getAddresses().forEach(address -> address.setStudent(student));
+        final Student student = toDomain(studentView);
         studentService.updateStudent(studentId, student);
         return ResponseEntity.accepted().build();
     }
