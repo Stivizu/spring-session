@@ -2,6 +2,7 @@ package com.stevecorp.tutorial.spring.service;
 
 import com.stevecorp.tutorial.spring.model.Student;
 import com.stevecorp.tutorial.spring.repository.StudentRepository;
+import com.stevecorp.tutorial.spring.service.exception.StudentNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,7 +18,7 @@ public class StudentService {
 
     public Student getStudent(final long id) {
         return studentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("There exists not student with id " + id + "!"));
+                .orElseThrow(() -> new StudentNotFoundException(id));
     }
 
     public List<Student> getStudentsWithAddressInCity(final String zipCode) {

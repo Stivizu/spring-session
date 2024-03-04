@@ -12,3 +12,4 @@ The final state can be observed on the main branch.
 - 01: Spring beans
 - 02: Project setup
 - 03: Spring data
+- 04: Spring web

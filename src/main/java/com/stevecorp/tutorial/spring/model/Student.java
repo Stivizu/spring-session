@@ -1,6 +1,8 @@
 package com.stevecorp.tutorial.spring.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Past;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -22,6 +24,8 @@ public class Student {
     @Embedded
     private Name name;
 
+    @Past
+    @NotNull
     private LocalDate dateOfBirth;
 
     @OneToMany(
