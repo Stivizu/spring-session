@@ -17,3 +17,4 @@ The final state can be observed on the main branch.
 - 06: Paging and sorting
 - 07: Soft deletes
 - 08: DTO objects
+- 09: Flyway
